@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>American Tree Experts - Chat Support</title>
+    <meta name="description" content="Chat with American Tree Experts for professional tree care assistance.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="chatbot-container">
+        <div id="chatbot-window" class="chatbot-window active">
+            <div class="chatbot-header">
+                <div class="chatbot-header-info">
+                    <div class="chatbot-avatar">🌳</div>
+                    <div>
+                        <div class="chatbot-title">American Tree Experts</div>
+                        <div class="chatbot-status">
+                            <span class="status-dot"></span>
+                            Online
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="chatbot-messages" class="chatbot-messages">
+                <div class="message bot-message">
+                    <div class="message-avatar">🌳</div>
+                    <div class="message-content">
+                        <p>This is Abdias from American Tree Experts<br>How I may assist you today.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick replies are hidden via CSS as requested previously -->
+            <div class="chatbot-quick-replies" id="quick-replies">
+                <button class="quick-reply" onclick="sendQuickReply('I need tree removal')">Tree Removal</button>
+                <button class="quick-reply" onclick="sendQuickReply('How much does it cost?')">Pricing Info</button>
+                <button class="quick-reply" onclick="sendQuickReply('Emergency service')">Emergency Help</button>
+                <button class="quick-reply" onclick="sendQuickReply('Schedule estimate')">Free Estimate</button>
+            </div>
+
+            <div class="chatbot-input">
+                <input type="text" id="chatbot-input-field" placeholder="Type your message..."
+                    onkeypress="handleKeyPress(event)">
+                <button class="chatbot-send" onclick="sendMessage()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+
+</html>
