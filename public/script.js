@@ -189,7 +189,9 @@ async function callOpenAI(userMessage) {
         });
 
         if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
+            const errorData = await response.text();
+            console.error('API Error Details:', errorData);
+            throw new Error(`API error: ${response.status} - ${errorData}`);
         }
 
         const data = await response.json();

@@ -16,6 +16,11 @@ module.exports = async (req, res) => {
 
     if (req.method === 'POST') {
         try {
+            if (!process.env.OPENAI_API_KEY) {
+                console.error('Missing OPENAI_API_KEY environment variable');
+                return res.status(500).json({ error: 'Server configuration error: Missing API Key' });
+            }
+
             const { message, conversationHistory } = req.body;
 
             if (!message) {
@@ -131,9 +136,17 @@ Always gather enough information to provide helpful guidance while being convers
 
         } catch (error) {
             console.error('OpenAI API Error:', error);
+
+            // Check for specific OpenAI errors
+            if (error.response) {
+                console.error('OpenAI Response Status:', error.response.status);
+                console.error('OpenAI Response Data:', error.response.data);
+            }
+
             return res.status(500).json({
                 error: 'Failed to get response from chatbot',
-                details: error.message
+                details: error.message,
+                stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
             });
         }
     }
