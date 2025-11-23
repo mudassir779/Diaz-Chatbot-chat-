@@ -1,16 +1,11 @@
 {
-  "name": "tree-chatbot-server",
+  "name": "diaz-chatbot",
   "version": "1.0.0",
-  "description": "Backend server for American Tree Experts chatbot",
-  "main": "server.js",
+  "description": "AI-powered chatbot for American Tree Experts",
   "scripts": {
-    "start": "node server.js"
+    "build": "echo 'No build required'"
   },
   "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
-    "express": "^4.18.2",
-    "node-fetch": "^2.6.9",
     "openai": "^6.9.1"
   }
 }
