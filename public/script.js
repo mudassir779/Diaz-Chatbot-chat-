@@ -2,7 +2,7 @@
 let conversationContext = [];
 
 // Backend API Configuration
-const BACKEND_API_URL = 'http://localhost:3000';
+const BACKEND_API_URL = '/api/chat';
 
 // Firebase is optional - uncomment below if you want to use Firebase for custom Q&A
 // import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -177,7 +177,7 @@ async function callOpenAI(userMessage) {
             { role: 'assistant', content: ctx.bot }
         ]);
 
-        const response = await fetch('http://localhost:3000/api/chat', {
+        const response = await fetch(BACKEND_API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

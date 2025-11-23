@@ -1,26 +1,28 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const fetch = require('node-fetch');
+const OpenAI = require('openai');
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+});
 
-// OpenAI API Configuration
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
+module.exports = async (req, res) => {
+    // Enable CORS
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-if (!OPENAI_API_KEY) {
-    console.error('ERROR: OPENAI_API_KEY is not set in environment variables');
-    process.exit(1);
-}
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+    if (req.method === 'POST') {
+        try {
+            const { message, conversationHistory } = req.body;
 
-// System prompt for the chatbot
-const systemPrompt = `You are Abdias, a helpful customer service representative for American Tree Experts. 
+            if (!message) {
+                return res.status(400).json({ error: 'Message is required' });
+            }
+
+            const systemPrompt = `You are Abdias, a helpful customer service representative for American Tree Experts. 
 
 Company Information:
 - Name: American Tree Experts
@@ -106,62 +108,35 @@ Your tone should be:
 
 Always gather enough information to provide helpful guidance while being conversational and natural.`;
 
-// API endpoint for chatbot
-app.post('/api/chat', async (req, res) => {
-    try {
-        const { message, conversationHistory } = req.body;
+            // Prepare messages array
+            let messages = [{ role: 'system', content: systemPrompt }];
 
-        if (!message) {
-            return res.status(400).json({ error: 'Message is required' });
-        }
+            // Add conversation history if provided
+            if (conversationHistory && Array.isArray(conversationHistory)) {
+                messages = messages.concat(conversationHistory);
+            }
 
-        // Build messages array for OpenAI
-        const messages = [
-            { role: 'system', content: systemPrompt },
-            ...conversationHistory,
-            { role: 'user', content: message }
-        ];
+            // Add current user message
+            messages.push({ role: 'user', content: message });
 
-        // Call OpenAI API
-        const response = await fetch(OPENAI_API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${OPENAI_API_KEY}`
-            },
-            body: JSON.stringify({
+            const completion = await openai.chat.completions.create({
                 model: 'gpt-3.5-turbo',
                 messages: messages,
                 temperature: 0.7,
-                max_tokens: 500
-            })
-        });
+                max_tokens: 500,
+            });
 
-        if (!response.ok) {
-            const errorData = await response.text();
-            console.error('OpenAI API Error:', errorData);
-            throw new Error(`OpenAI API error: ${response.status}`);
+            const reply = completion.choices[0].message.content;
+            return res.status(200).json({ response: reply }); // Returning 'response' to match frontend expectation
+
+        } catch (error) {
+            console.error('OpenAI API Error:', error);
+            return res.status(500).json({
+                error: 'Failed to get response from chatbot',
+                details: error.message
+            });
         }
-
-        const data = await response.json();
-        const botResponse = data.choices[0].message.content;
-
-        res.json({ response: botResponse });
-
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({
-            error: 'Failed to get response',
-            message: "I apologize, but I'm having trouble connecting right now. Please call us directly at (555) 123-4567 for immediate assistance."
-        });
     }
-});
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-    res.json({ status: 'ok' });
-});
-
-app.listen(PORT, () => {
-    console.log(`🌳 American Tree Experts Chatbot Server running on http://localhost:${PORT}`);
-});
+    return res.status(405).json({ error: 'Method not allowed' });
+};
